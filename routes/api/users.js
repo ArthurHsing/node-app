@@ -19,7 +19,7 @@ router.post("/register", (req, res) => {
     User.findOne({email:req.body.email})
         .then((user) => {
             if (user) {
-                return res.status(400).json({email: "邮箱已被注册!"});
+                res.status(400).json({email: "邮箱已被注册!"});
             }else {
                 const avatar = gravatar.url(req.body.email, {s: '200', r: 'pg', d: 'mm'});
                 // 创建实体
@@ -40,6 +40,31 @@ router.post("/register", (req, res) => {
                     });
                 });
             }
+        });
+});
+
+// $route POST api/users/login
+// @desc 返回token jwt passport
+// @access public
+
+router.post("/login", (req, res) => {
+    console.log("接口被访问");
+    const email = req.body.email;
+    const password = req.body.password;
+    // 查询数据库
+    User.findOne({email})
+        .then(user => {
+            if (!user){
+                return res.status(404).json({email:"用户不存在!"});
+            }
+            // 密码匹配
+            bcrypt.compare(password, user.password).then((result) => {
+                if (result) {
+                    res.json({msg:"success"});
+                }else{
+                    return res.status(400).json({password:"密码错误"});
+                }
+            });
         });
 });
 module.exports = router;
