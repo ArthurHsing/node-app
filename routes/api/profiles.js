@@ -72,8 +72,15 @@ router.post("/edit/:id", passport.authenticate('jwt', {session: false}), (req, r
     Profile.findOneAndUpdate(
         {_id: req.params.id},
         {$set: profileFileds},
-        {new: true}
-    ).then(profile => res.json(profile));
+        {new: true} //返回修改的数据，false是返回之前的
+    , (err, profile) => {
+        if (err) {
+            console.log(err);
+            res.json('找不到此id');
+        }else {
+            res.json(profile);
+        }
+    });
 });
 
 // @route POST api/profiles/delete
@@ -91,5 +98,5 @@ router.get(
             }
         }); 
     }
-)
+);
 module.exports = router;
